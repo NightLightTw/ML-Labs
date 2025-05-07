@@ -1,6 +1,8 @@
 .DS_Store
+*.pth
 Labs6/dataset
 Labs7/best_model.pth
 Labs7/data
 Labs8/dataset
+Labs8/dataset_split
 Labs8/dataset.zip
