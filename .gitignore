@@ -9,3 +9,6 @@ Labs8/dataset_split
 Labs8/dataset.zip
 final_project/Dataset
 final_project/Dataset.zip
+final_project/archived
+final_project/output
+*.csv

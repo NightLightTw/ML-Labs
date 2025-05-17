@@ -87,9 +87,12 @@ def get_model():
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-def train_model(model, train_loader, epochs=10):
+def train_model(model, train_loader, epochs=10, patience=5, save_path="best_model.pth"):
     model.train()
     optimizer = torch.optim.Adam([p for p in model.parameters() if p.requires_grad], lr=1e-4)
+    # === Early stopping parameters ===
+    best_loss = float('inf')
+    patience_counter = 0
 
     for epoch in range(epochs):
         total_loss = 0
@@ -104,7 +107,20 @@ def train_model(model, train_loader, epochs=10):
             optimizer.step()
             total_loss += loss.item()
 
-        print(f"Epoch {epoch+1} Loss: {total_loss:.4f}")
+        # Compute average loss for this epoch
+        avg_loss = total_loss / len(train_loader)
+        print(f"Epoch {epoch+1} Loss: {avg_loss:.4f}")
+        # === Early stopping and best model saving ===
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            torch.save(model.state_dict(), save_path)
+            print(f"[INFO] Saved new best model to {save_path}")
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print(f"[INFO] Early stopping triggered. No improvement in {patience} epochs.")
+                break
 
 def predict_and_export(model, val_dir, save_csv_path, save_img_dir="output"):
     # import matplotlib.pyplot as plt
@@ -187,12 +203,14 @@ def predict_and_export(model, val_dir, save_csv_path, save_img_dir="output"):
     print(f"[INFO] Saved annotated images to {save_img_dir}/")
 
 if __name__ == "__main__":
+    print(f"[INFO] Using device: {DEVICE}")
+    
     # Train (optional)
     train_dataset = NEUDETDataset(TRAIN_IMG_ROOT, TRAIN_ANN_ROOT)
-    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
 
     model = get_model()
-    train_model(model, train_loader, epochs=100)
+    train_model(model, train_loader, epochs=100, patience=5, save_path="best_model.pth")
 
     # Predict and save CSV
     predict_and_export(model, VAL_IMG_ROOT, SUBMISSION_PATH, save_img_dir="output")
