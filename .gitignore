@@ -1,3 +1,4 @@
+*__pycache__
 .DS_Store
 *.pth
 Labs6/dataset
@@ -7,9 +8,12 @@ Labs7/data
 Labs8/dataset
 Labs8/dataset_split
 Labs8/dataset.zip
+Labs9/data
+Labs9/results
 final_project/Dataset
 final_project/Dataset.zip
 final_project/archived
-final_project/output
+final_project/output_predictions
+final_project/checkpoints
+final_project/outputs
 *.csv
-Labs9/data
